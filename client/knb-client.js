@@ -1,3 +1,4 @@
+const https = require('https')
 const io = require("socket.io-client");
 const os = require("os");
 
@@ -15,7 +16,12 @@ function setCurrentDirVariable()
 }
 
 
-const socket = io("http://192.168.178.48:3000", {
+let url = "http://192.168.178.";
+let ip = 48;
+let port = 3000;
+
+
+const socket = io(url + ip + ":" + port, {
     reconnectionDelayMax: 10000,
     auth: {
         token: "123"
