@@ -44,7 +44,7 @@
             let command = $("#m").val();
             
             socket.emit("send-command", {client: name, cmd: command}); // $('#m').val()})
-      		// $('#m').val();
+      		$('#m').val('');
             return false;
         });
 
