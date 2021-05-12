@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+
+<head>
+
+    <title>Simple realtime chatroom</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="./css/style.css">
+
+</head>
+<body>
+
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+
+    <div>
+
+        <div class="d-inline-block">
+            <div>
+                <p>fenrir</p>
+            </div>
+        </div>
+
+        <div class="d-inline-block">
+            <!-- output -->
+            <textarea id="messages" cols="92" rows="12" readonly class="shadow-m"></textarea>        
+        
+            <!-- input -->
+            <div id="cli">
+                <div class="d-inline-block mx-8">
+                    <p><span id="username" class="shadow-sm d-inline">kraibse</span> @ <span id="host">fenrir</span></p>
+                </div>
+            
+                <form action="" class="d-inline-block">
+                    <input id="m" class="w-100 b-none" placeholder="Enter your message..." class="d-inline" autocomplete="off">
+                </form>
+            </div>
+        </div>
+
+    </div>
+
+
+    <!-- socket dependencies -->
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+
+        const socket = io();
+
+        
+        socket.emit("register", "Web-Terminal");
+        
+        $('form').submit( function(e) {
+            e.preventDefault();
+            var name = $('#host').text();
+            let command = $("#m").val();
+            
+            socket.emit("send-command", {client: name, cmd: command}); // $('#m').val()})
+      		// $('#m').val();
+            return false;
+        });
+
+
+        // display on the console
+        socket.on("new-message", function (msg) {
+            let content = $("#messages").val();
+            $("#messages").val(content + msg + "\n"); //append($("<li>").text(msg))
+        });
+
+    </script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.4/socket.io.js"></script>
+    
+</body>
+</html>

@@ -1,0 +1,30 @@
+body
+{
+    background-color: darkcyan;
+}
+
+input {
+    padding: 2px;
+}
+
+#messages {
+    background-color: #000;
+    color: #0f0;
+    padding: 8px;
+}
+
+#cli {
+    width: 679px;
+    margin: 0px;
+    padding: 8px;
+    background-color: #000;
+    color: #0f0;
+}
+
+#terminal {
+    background-color: #000;
+    color: #0f0;
+    margin: 0px;
+    text-decoration: none;
+    list-style: none;
+}
