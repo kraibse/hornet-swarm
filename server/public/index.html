@@ -21,7 +21,7 @@
 
         <div class="d-inline-block">
             <!-- output -->
-            <textarea id="messages" cols="92" rows="12" readonly class="shadow-m"></textarea>        
+            <textarea id="terminal" cols="92" rows="12" readonly class="shadow-m"></textarea>        
         
             <!-- input -->
             <div id="cli">
@@ -60,8 +60,13 @@
 
         // display on the console
         socket.on("new-message", function (msg) {
-            let content = $("#messages").val();
-            $("#messages").val(content + msg + "\n"); //append($("<li>").text(msg))
+            let console = $('#terminal');
+            let content = console.val();
+            
+            console.val(content + msg + "\n"); //append($("<li>").text(msg))
+        
+            if(console.length)
+                console.scrollTop(console[0].scrollHeight - console.height());
         });
 
     </script>
