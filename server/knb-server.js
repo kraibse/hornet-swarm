@@ -48,7 +48,7 @@ io.on("connection", (socket) => {
         clients.push({ name : name, id: socket.id });
 
         console.log(`${name} established a connection # ${socket.id}\n`);
-        io.emit('new-message', `---${name} joined the chat---`);
+        io.emit('new-message', `${name} established a connection # ${socket.id}\n`);
     });
 
 
