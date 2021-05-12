@@ -11,28 +11,19 @@
 
     <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
 
-    <div class="mx-16">
-
-        <div class="d-inline">
-            <div>
-                <p>fenrir</p>
-            </div>
+    <div id='cli' class="mx-auto shadow-xl">
+        <div id='terminal-top' class='f-right'>
+            <p><span id="username">kraibse</span>@<span id="host">fenrir</span></p>
         </div>
 
-        <div class="d-inline-block">
+        <div>
             <!-- output -->
-            <textarea id="terminal" cols="92" rows="12" readonly class="shadow-m"></textarea>        
+            <textarea id="terminal" rows="12" readonly class="shadow-m"></textarea>        
         
             <!-- input -->
-            <div id="cli">
-                <div class="d-inline-block mx-8">
-                    <p><span id="username" class="shadow-sm d-inline">kraibse</span> @ <span id="host">fenrir</span></p>
-                </div>
-            
-                <form action="" class="d-inline-block">
-                    <input id="m" class="w-100 b-none" size=92 placeholder="Enter your message..." class="d-inline" autocomplete="off">
-                </form>
-            </div>
+            <form action="" class="">
+                <input id="m" class="w-100 b-none" placeholder="Enter your message..." class="d-inline" autocomplete="off">
+            </form>
         </div>
 
     </div>
