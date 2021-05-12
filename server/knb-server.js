@@ -35,6 +35,7 @@ function getSidFromId(client)
 }
 
 
+let serverName = "Web-Terminal";
 var clients = [];
 
 io.on("connection", (socket) => {
@@ -77,13 +78,17 @@ io.on("connection", (socket) => {
             socket.emit("new-message", currentDir + ": '" + target + "' is not connected to the swarm.");
         };
 
-        let serverName = "Web-Terminal";
 
         socket.to(sid).emit("send-command", {cwd: currentDir, client: serverName, cmd: command});
     });
 
 
-    //  { working }
+    socket.on('clear-terminal', () => {
+        let wtSid = getSidFromId(serverName);
+        socket.to(wtSid).emit('clear-terminal');
+        console.log('clearing terminal on wt');
+    });
+
     socket.on('disconnect', () => {
 
         // removing user from clients list

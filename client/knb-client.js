@@ -43,18 +43,25 @@ socket.on("connect", () => {
     
     socket.on("pwd", () => {
         setCurrentDirVariable();
-    });
-    
+    }); 
 });
-
 
 socket.on("send-command", (data) => {
     // connection coming through directly
     let client = data.client;
     let cwd = __dirname;
-    let command = data.cmd;
-    
+    let command = data.cmd.trim();
+
     let message = `${cwd}$ ` + command;
+    
+    socket.emit('new-message', command);
+    if (command == "clear")
+    {
+        socket.emit('clear-terminal');    // triggered on webterminal
+        socket.emit('new-message', cwd + "$ ");
+        return;
+    }
+  
     
     const cmd = exec(command, (error, stdout, stderr) => {
         if (error)

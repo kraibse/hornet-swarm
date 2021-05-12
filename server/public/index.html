@@ -60,13 +60,20 @@
 
         // display on the console
         socket.on("new-message", function (msg) {
-            let console = $('#terminal');
-            let content = console.val();
-            
-            console.val(content + msg + "\n"); //append($("<li>").text(msg))
+            let terminal = $('#terminal');
+            let content = terminal.val();
+
+            terminal.val(content + msg + "\n"); //append($("<li>").text(msg))
         
-            if(console.length)
-                console.scrollTop(console[0].scrollHeight - console.height());
+            if(terminal.length)
+                terminal.scrollTop(terminal[0].scrollHeight - terminal.height());
+        });
+
+
+        // clears the console
+        socket.on('clear-terminal', () => {
+            let terminal = $('#terminal');
+            terminal.val('');
         });
 
     </script>
