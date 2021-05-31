@@ -9,8 +9,33 @@ input {
 p, span {
     margin: 4px;
 }
-.wrapper
-{
+
+#cli {
     width: 960px;
-    align-items: center;
+    margin-top: 64px;
+    /* padding: 8px; */
+    background-color: #000;
+    color: #0f0;
+
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
 }
+
+#terminal {
+    width: 100%;
+    min-height: 360px;
+    padding: 12px;
+    background-color: #000;
+    color: #0f0;
+    border-style: none;
+}
+
+#terminal-top
+{
+    background-color: #333;
+    padding: 4px;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+}
+
+
