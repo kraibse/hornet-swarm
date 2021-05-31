@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+
+<head>
+
+    <title>Simple realtime chatroom</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="./css/style.css">
+
+</head>
+<body >
+
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+
+    <div class="wrapper">
+        <button>remote-interface</button>
+        <button></button>
+    </div>
+
+
+    <!-- socket dependencies -->
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+
+        const socket = io();
+        socket.emit("register", "Web-Terminal");
+        
+        // code
+    </script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.4/socket.io.js"></script>
+    
+</body>
+</html>
