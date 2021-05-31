@@ -3,10 +3,10 @@ linux:
     sudo apt-get update
     sudo apt-get install nodejs npm
 
-    npm install socket.io express
+    npm install socket.io express nodemon
 
 
 windows:
     get nodejs installer (and also select the npm option in it)
 
-    npm install socket.io express
+    npm install socket.io express nodemon
