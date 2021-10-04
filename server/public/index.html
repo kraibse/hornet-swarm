@@ -29,14 +29,8 @@
             e.preventDefault();
             var name = $('#host').text();
             let command = $("#m").val();
-
-            if (name == "Select")
-            {
-                $("#status").show();
-                return;
-            }
             
-            socket.emit("send-command", {client: name, instance: id, cmd: command}); // $('#m').val()})
+            socket.emit("send-command", {client: name, cmd: command}); // $('#m').val()})
       		$('#m').val('');
             return false;
         });
@@ -47,6 +41,7 @@
 
             let terminal = $('#terminal');
             terminal.val('');
+            console.log("Event received -> clear-terminal");
         });
 
 
@@ -66,8 +61,8 @@
 
         socket.on("refresh-clients", (clients) => {
             // Updates the client dropdown selection
-
             console.log(clients);
+
             $("#client-selection").empty();
 
             for (let i = 0; i < clients.length; i++)
@@ -76,9 +71,9 @@
                 if (client == "Web-Terminal")   // exlcudes the web client
                 {
                     if (clients.length > 1 && $("#host").text() != "Select")
-                        $("#status").hide();
+                        $("#status").text(clients.length - 1);
                     else
-                        $("#status").style("display", "block");
+                        $("#status").text("0");
 
                     continue;
                 }
@@ -111,10 +106,10 @@
                 </div>
                 
                 <!-- First time refreshing the client list -->
-                <script>socket.emit('get-clients');</script>
+                <script>getClients();</script>
 
-                <p id="status" class="float-right text-danger align-middle">Please select a client to start</p>
-                <p class="float-right mr-5 pt-1"><span id="counter">0</span>&#x1F7E2;</p>
+                <!-- <p id="status" class="float-right text-danger align-middle">Please select a client to start</p> -->
+                <p class="float-right mr-5 pt-1"><span id="status">0</span>&#x1F7E2;</p>
             </div>
         </div>
 
@@ -127,7 +122,7 @@
                 <input id="m" class="w-100 b-none float-left" placeholder="Enter your message..." class="d-inline" autocomplete="off">
                 <div class="float-right">
                     <button class="btn bg-danger text-light">delete</button>
-                    <button class="btn bg-primary text-light">submit</button>
+                    <button class="btn bg-primary text-light" type="submit">submit</button>
                 </div>
             </form>
         </div>

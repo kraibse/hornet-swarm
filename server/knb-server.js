@@ -84,7 +84,7 @@ io.on("connection", (socket) => {
         });
 
         console.log('Client ' + name + ' disconnected\n');
-        io.emit('new-message', `---${name} left the chat---`);
+        io.emit('new-message', `Client '${name}' just disconnected`);
     });
 
     io.on("exit", () => {
@@ -112,24 +112,24 @@ io.on("connection", (socket) => {
         // and requests a refresh on the Web-Terminal.
 
         name = deviceName;
-        id = getInstances(name);
+        // id = getInstances(name);
 
-        clients.push({ name: name, id: socket.id, instance: id});
+        clients.push({ name: name, id: socket.id});
 
         let sid = getSidFromId('Web-Terminal');
         io.to(sid).emit('refresh-clients', clients);
 
-        console.log(`${name}-${id} established a connection # ${socket.id}\n`);
+        console.log(`${name} established a connection # ${socket.id}\n`);
         io.emit('new-message', `${name} established a connection # ${socket.id}\n`);
     });    
     
 
     socket.on('new-message', (message) => {
         // Broadcasts a log message to every conncected client
-        message = `${name}: ` + message
+        message = `${name}: ` + message;
         console.log(message);
 
-        socket.broadcast.emit('new-message', message);
+        io.emit('new-message', message);
     });
     
 
@@ -145,7 +145,7 @@ io.on("connection", (socket) => {
         }
         else
         {
-            socket.to(sid).emit("send-command", {cwd: currentDir, client: wt, cmd: command});
+            io.to(sid).emit("send-command", {cwd: currentDir, client: wt, cmd: command});
         }        
     });
 
