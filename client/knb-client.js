@@ -17,7 +17,7 @@ function setCurrentDirVariable()
 
 
 let url = "http://192.168.178.";
-let ip = 48;
+let ip = 64;
 let port = 3000;
 
 

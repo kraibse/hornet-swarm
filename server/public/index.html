@@ -2,7 +2,7 @@
 
 <head>
 
-    <title>Simple realtime chatroom</title>
+    <title>Projektarbeit - Leon Horn</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
     <link rel="stylesheet" href="./css/style.css">
 
@@ -11,46 +11,49 @@
 
     <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
 
-    <div id='cli' class="mx-auto shadow-xl">
-        <div id='terminal-top' class='f-right'>
-            <p><span id="username">kraibse</span>@<span id="host">fenrir</span></p>
-        </div>
-
-        <div>
-            <!-- output -->
-            <textarea id="terminal" rows="12" readonly class="shadow-m"></textarea>        
-        
-            <!-- input -->
-            <form action="" class="">
-                <input id="m" class="w-100 b-none" placeholder="Enter your message..." class="d-inline" autocomplete="off">
-            </form>
-        </div>
-
-    </div>
-
-
     <!-- socket dependencies -->
     <script src="/socket.io/socket.io.js"></script>
     <script>
 
         const socket = io();
+        socket.emit("register", "Web-Terminal");    // registering itself to the server
 
-        
-        socket.emit("register", "Web-Terminal");
+        function getClients()
+        {
+            socket.emit('get-clients');
+        }
         
         $('form').submit( function(e) {
+            // this code will be run when sending a command
+
             e.preventDefault();
             var name = $('#host').text();
             let command = $("#m").val();
+
+            if (name == "Select")
+            {
+                $("#status").show();
+                return;
+            }
             
-            socket.emit("send-command", {client: name, cmd: command}); // $('#m').val()})
+            socket.emit("send-command", {client: name, instance: id, cmd: command}); // $('#m').val()})
       		$('#m').val('');
             return false;
         });
 
 
-        // display on the console
+        socket.on('clear-terminal', () => {
+            // Clears the console on the webserver
+
+            let terminal = $('#terminal');
+            terminal.val('');
+        });
+
+
         socket.on("new-message", function (msg) {
+            // Receives a transmission from either the server
+            // or another connected client.
+
             let terminal = $('#terminal');
             let content = terminal.val();
 
@@ -61,15 +64,83 @@
         });
 
 
-        // clears the console
-        socket.on('clear-terminal', () => {
-            let terminal = $('#terminal');
-            terminal.val('');
+        socket.on("refresh-clients", (clients) => {
+            // Updates the client dropdown selection
+
+            console.log(clients);
+            $("#client-selection").empty();
+
+            for (let i = 0; i < clients.length; i++)
+            {
+                let client = clients[i]["name"];
+                if (client == "Web-Terminal")   // exlcudes the web client
+                {
+                    if (clients.length > 1 && $("#host").text() != "Select")
+                        $("#status").hide();
+                    else
+                        $("#status").style("display", "block");
+
+                    continue;
+                }
+
+                console.log(client);
+                let button = "<button class='dropdown-item' onclick='updateCurrentClient(\"" + client + "\")'>" + client + "</button>";
+
+                $("#client-selection").append(button);
+            }
         });
+
+        function updateCurrentClient(client)
+        {
+            $("#host").text(client);
+        }
 
     </script>
 
+
+    <div id='cli' class="mx-auto shadow-xl">
+        <div id='terminal-top' class='f-right'>
+            <!-- <p><span id="username">kraibse</span>@<span id="host">fenrir</span></p> -->
+            <div class="dropdown">
+                <button onclick="getClients()" class="btn text-light">&#8634; reload clients</button>
+                <button id="host" class="float-right btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Select
+                </button>
+                <div id="client-selection" class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                    <!-- content will be generated as client are connecting -->
+                </div>
+                
+                <!-- First time refreshing the client list -->
+                <script>socket.emit('get-clients');</script>
+
+                <p id="status" class="float-right text-danger align-middle">Please select a client to start</p>
+                <p class="float-right mr-5 pt-1"><span id="counter">0</span>&#x1F7E2;</p>
+            </div>
+        </div>
+
+        <div>
+            <!-- terminal output -->
+            <textarea id="terminal" rows="12" readonly class="shadow-m"></textarea>        
+        
+            <!-- input -->
+            <form action="" class="">
+                <input id="m" class="w-100 b-none float-left" placeholder="Enter your message..." class="d-inline" autocomplete="off">
+                <div class="float-right">
+                    <button class="btn bg-danger text-light">delete</button>
+                    <button class="btn bg-primary text-light">submit</button>
+                </div>
+            </form>
+        </div>
+
+
+    </div>
+
+
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.4/socket.io.js"></script>
-    
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+
 </body>
 </html>

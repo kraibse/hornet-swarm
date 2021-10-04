@@ -9,15 +9,19 @@ const server = http.createServer(app);
 
 const io = socketio(server);
 
-// Static files
-app.use(express.static("./public"));
+let wt = "Web-Terminal";
+var clients = [];
 
+
+// website setup
+app.use(express.static("./public"));
 
 app.get('/', (req, res) => {
   res.sendFile(__dirname + '/public/index.html');
 })
 
 
+// declaration of local functions
 function getSidFromId(client)
 {
     // clients - global list of connected clients
@@ -35,63 +39,41 @@ function getSidFromId(client)
 }
 
 
-let serverName = "Web-Terminal";
-var clients = [];
+function getInstances(client)
+{
+    // Checks the client registry for an already existing name
+    // and compares their socket connection IDs.
+    let counter = 0;
 
+    clients.forEach(entry => {
+        if (entry.name == client)
+        {
+            counter++;
+        }
+    });
+    return counter;
+}
+
+
+// declaration of socket events
 io.on("connection", (socket) => {
+    // Triggers when a client connects to the server.
+    //
     let name;
+    let id;
     let currentDir;
 
-    // first login
-    socket.on('register', (deviceName) =>
-    {
-        name = deviceName;
-        clients.push({ name : name, id: socket.id });
-
-        console.log(`${name} established a connection # ${socket.id}\n`);
-        io.emit('new-message', `${name} established a connection # ${socket.id}\n`);
-    });
-
-
-    socket.on('set-cwd', (path) =>
-    {
-        currentDir = path;
-    });
-
-  
-    socket.on('new-message', (message) => {
-        message = `${name}: ` + message
-
-        console.log(message);
-        socket.broadcast.emit('new-message', message);
-    });
-  
-
-    socket.on('send-command', (data) => {
-        let target = data.client;
-        let command = data.cmd;
-
-        let sid = getSidFromId(target);    
-        if (sid == null)
-        {
-            // client does not exist in swarm
-            socket.emit("new-message", currentDir + ": '" + target + "' is not connected to the swarm.");
-        };
-
-
-        socket.to(sid).emit("send-command", {cwd: currentDir, client: serverName, cmd: command});
-    });
-
-
     socket.on('clear-terminal', () => {
-        let wtSid = getSidFromId(serverName);
-        socket.to(wtSid).emit('clear-terminal');
-        console.log('clearing terminal on wt');
+        // Sends the event clear-terminal 
+        //
+        let sid = getSidFromId(wt);
+        socket.to(sid).emit('clear-terminal');
+        console.log(wt + ' -> Clearing commandline output');
     });
-
+    
     socket.on('disconnect', () => {
-
         // removing user from clients list
+        //
         let i = 0;
         clients.forEach(entry => {
             if (entry.name == name)
@@ -101,12 +83,76 @@ io.on("connection", (socket) => {
             i = i + 1;
         });
 
-        console.log('User ' + name + ' disconnected\n');
+        console.log('Client ' + name + ' disconnected\n');
         io.emit('new-message', `---${name} left the chat---`);
     });
 
     io.on("exit", () => {
         console.log("Exiting");
+    });
+
+
+    socket.on('get-clients', () => {
+        // Returns a list of currently connected clients
+        let sid = getSidFromId(wt);
+        for (let i = 0; i < clients.length; i++)
+        {
+            if (clients[i].name == wt)  // skips second registration message
+                continue;
+
+            io.emit('new-message', `${clients[i].name} established a connection # ${clients[i].id}`);
+        }
+        io.to(sid).emit('refresh-clients', clients);
+    });
+    
+
+    socket.on('register', (deviceName) =>
+    {
+        // Checks for other instances, adds them to the server registry
+        // and requests a refresh on the Web-Terminal.
+
+        name = deviceName;
+        id = getInstances(name);
+
+        clients.push({ name: name, id: socket.id, instance: id});
+
+        let sid = getSidFromId('Web-Terminal');
+        io.to(sid).emit('refresh-clients', clients);
+
+        console.log(`${name}-${id} established a connection # ${socket.id}\n`);
+        io.emit('new-message', `${name} established a connection # ${socket.id}\n`);
+    });    
+    
+
+    socket.on('new-message', (message) => {
+        // Broadcasts a log message to every conncected client
+        message = `${name}: ` + message
+        console.log(message);
+
+        socket.broadcast.emit('new-message', message);
+    });
+    
+
+    socket.on('send-command', (data) => {
+        let target = data.client;
+        let command = data.cmd;
+        
+        let sid = getSidFromId(target);    
+        if (sid == null)
+        {
+            // client does not exist in swarm
+            socket.emit("new-message", currentDir + ": '" + target + "' is not connected to the swarm.");
+        }
+        else
+        {
+            socket.to(sid).emit("send-command", {cwd: currentDir, client: wt, cmd: command});
+        }        
+    });
+
+
+    socket.on('set-cwd', (path) =>
+    {
+        currentDir = path;
     });
 });
 
