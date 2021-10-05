@@ -1,0 +1,3 @@
+Login message : wrong OS	->	always the server OS
+Only one Web-Terminal instance allowed
+Only one client terminal is allowed
