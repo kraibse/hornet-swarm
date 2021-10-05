@@ -48,19 +48,22 @@ socket.on("pwd", () => {
 socket.on("send-command", (data) => {
     // connection coming through directly
     
-    let client = data.client;
-    let cwd = __dirname;
+    let sid = data.id;
+    let cwd = "~/client/";
     let command = data.cmd.trim();
     
     let message = `${cwd}$ ` + command;
-    console.log("Incoming command -> " + message);
+    console.log("Incoming command -> " + command);
     
-    // socket.emit('new-message', command);
-    if (command == "clear")
+    if (command == null || command == "")
+        return;
+
+    // Start of custom commands
+    console.log(os.platform());
+    if (command == "clear" && os.platform() == "Windows")
     {
         socket.emit('clear-terminal');    // triggered on webterminal
-        socket.emit('new-message', cwd + "$ ");
-        // return;
+        socket.to(sid).emit('new-message', cwd + "$ " + command);
     }
   
     
