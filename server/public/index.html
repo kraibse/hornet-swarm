@@ -14,36 +14,31 @@
     <!-- socket dependencies -->
     <script src="/socket.io/socket.io.js"></script>
     <script>
-
         const socket = io();
+
         socket.emit("register", "Web-Terminal");    // registering itself to the server
 
-        function getClients()
+        function clearTerminal()
         {
-            socket.emit('get-clients');
-        }
-        
-        $('form').submit( function(e) {
-            // this code will be run when sending a command
-
-            e.preventDefault();
-            var name = $('#host').text();
-            let command = $("#m").val();
-            
-            socket.emit("send-command", {client: name, cmd: command}); // $('#m').val()})
-      		$('#m').val('');
-            return false;
-        });
-
-
-        socket.on('clear-terminal', () => {
             // Clears the console on the webserver
 
             let terminal = $('#terminal');
             terminal.val('');
             console.log("Event received -> clear-terminal");
-        });
+        }
+        
+        function getClients()
+        {
+            let content = $('#terminal').val();
+            $("#terminal").val(content + "Refreshing available clients...\n");
+            socket.broadcast.emit('get-clients');
+        }
 
+
+        socket.on('clear-terminal', () => {
+            // Clears the console on the webserver
+            clearTerminal();
+        });
 
         socket.on("new-message", function (msg) {
             // Receives a transmission from either the server
@@ -59,7 +54,7 @@
         });
 
 
-        socket.on("refresh-clients", (clients) => {
+        socket.on("refresh-clients", (clients, platform) => {
             // Updates the client dropdown selection
             console.log(clients);
 
@@ -68,26 +63,21 @@
             for (let i = 0; i < clients.length; i++)
             {
                 let client = clients[i]["name"];
-                if (client == "Web-Terminal")   // exlcudes the web client
-                {
-                    if (clients.length > 1 && $("#host").text() != "Select")
-                        $("#status").text(clients.length - 1);
-                    else
-                        $("#status").text("0");
-
-                    continue;
-                }
-
                 console.log(client);
-                let button = "<button class='dropdown-item' onclick='updateCurrentClient(\"" + client + "\")'>" + client + "</button>";
+
+                $("#status").text(clients.length);
+                let button = "<button class='dropdown-item' onclick='updateCurrentClient(\"" + `${client}\", \"${platform}\")'>` + client + "</button>";
 
                 $("#client-selection").append(button);
             }
         });
 
-        function updateCurrentClient(client)
+        function updateCurrentClient(client, platform)
         {
             $("#host").text(client);
+
+            let content = $('#terminal').val();
+            $('#terminal').val("" + `You logged onto a '${platform}' system.\n`);
         }
 
     </script>
@@ -97,7 +87,7 @@
         <div id='terminal-top' class='f-right'>
             <!-- <p><span id="username">kraibse</span>@<span id="host">fenrir</span></p> -->
             <div class="dropdown">
-                <button onclick="getClients()" class="btn text-light">&#8634; reload clients</button>
+                <button onclick="getClients();" class="btn text-light">&#8634; reload clients</button>
                 <button id="host" class="float-right btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     Select
                 </button>
@@ -120,9 +110,9 @@
             <!-- input -->
             <form action="" class="">
                 <input id="m" class="w-100 b-none float-left" placeholder="Enter your message..." class="d-inline" autocomplete="off">
-                <div class="float-right">
-                    <button class="btn bg-danger text-light">delete</button>
-                    <button class="btn bg-primary text-light" type="submit">submit</button>
+                <div class="float-right my-1">
+                    <button class="btn bg-danger text-light border border-dark" type="button" onclick="clearTerminal()">delete</button>
+                    <button class="btn bg-primary text-light border" type="submit">submit</button>
                 </div>
             </form>
         </div>
@@ -130,7 +120,21 @@
 
     </div>
 
+    <script>
+        // jQuery event declaration
+        $('form').submit( function(e) {
+            // this code will be run when sending a command
+            //
+            e.preventDefault();
 
+            var name = $('#host').text();
+            let command = $("#m").val();
+            
+            socket.emit("send-command", {client: name, cmd: command}); // $('#m').val()})
+      		$('#m').val('');
+            return false;
+        });
+    </script>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.4/socket.io.js"></script>
     <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>

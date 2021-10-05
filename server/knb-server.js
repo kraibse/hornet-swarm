@@ -1,4 +1,5 @@
 const express = require("express");
+const os = require("os");
 const http = require("http");
 const socketio = require("socket.io");
 
@@ -39,28 +40,11 @@ function getSidFromId(client)
 }
 
 
-function getInstances(client)
-{
-    // Checks the client registry for an already existing name
-    // and compares their socket connection IDs.
-    let counter = 0;
-
-    clients.forEach(entry => {
-        if (entry.name == client)
-        {
-            counter++;
-        }
-    });
-    return counter;
-}
-
-
 // declaration of socket events
 io.on("connection", (socket) => {
     // Triggers when a client connects to the server.
     //
     let name;
-    let id;
     let currentDir;
 
     socket.on('clear-terminal', () => {
@@ -74,7 +58,9 @@ io.on("connection", (socket) => {
     socket.on('disconnect', () => {
         // removing user from clients list
         //
+        console.log(clients);
         let i = 0;
+
         clients.forEach(entry => {
             if (entry.name == name)
             {
@@ -94,6 +80,8 @@ io.on("connection", (socket) => {
 
     socket.on('get-clients', () => {
         // Returns a list of currently connected clients
+        console.log(clients);
+
         let sid = getSidFromId(wt);
         for (let i = 0; i < clients.length; i++)
         {
@@ -102,6 +90,7 @@ io.on("connection", (socket) => {
 
             io.emit('new-message', `${clients[i].name} established a connection # ${clients[i].id}`);
         }
+
         io.to(sid).emit('refresh-clients', clients);
     });
     
@@ -112,12 +101,10 @@ io.on("connection", (socket) => {
         // and requests a refresh on the Web-Terminal.
 
         name = deviceName;
-        // id = getInstances(name);
-
         clients.push({ name: name, id: socket.id});
 
         let sid = getSidFromId('Web-Terminal');
-        io.to(sid).emit('refresh-clients', clients);
+        io.to(sid).emit('refresh-clients', clients, os.platform());
 
         console.log(`${name} established a connection # ${socket.id}\n`);
         io.emit('new-message', `${name} established a connection # ${socket.id}\n`);
@@ -126,7 +113,7 @@ io.on("connection", (socket) => {
 
     socket.on('new-message', (message) => {
         // Broadcasts a log message to every conncected client
-        message = `${name}: ` + message;
+        message = `[ ${name} ] : ` + message;
         console.log(message);
 
         io.emit('new-message', message);
@@ -143,10 +130,8 @@ io.on("connection", (socket) => {
             // client does not exist in swarm
             socket.emit("new-message", currentDir + ": '" + target + "' is not connected to the swarm.");
         }
-        else
-        {
-            io.to(sid).emit("send-command", {cwd: currentDir, client: wt, cmd: command});
-        }        
+
+        socket.to(sid).emit("send-command", {cwd: currentDir, id: sid, cmd: command});      
     });
 
 
