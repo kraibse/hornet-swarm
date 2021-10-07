@@ -1,11 +1,11 @@
 {
-  "name": "kn-botnet",
+  "name": "hub-server",
   "version": "1.0.0",
   "description": "- [ ] node.js",
-  "main": "knb-server.js",
+  "main": "server-main.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon knb-server.js"
+    "start": "nodemon server-main.js"
   },
   "author": "",
   "license": "ISC",

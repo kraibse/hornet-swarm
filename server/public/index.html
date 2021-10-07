@@ -16,7 +16,7 @@
     <script>
         const socket = io();
 
-        socket.emit("register", "Web-Terminal");    // registering itself to the server
+        socket.emit("register", "Web-Terminal", "Web");    // registering itself to the server
 
         function clearTerminal()
         {
@@ -47,26 +47,30 @@
             let terminal = $('#terminal');
             let content = terminal.val();
 
-            terminal.val(content + msg + "\n"); //append($("<li>").text(msg))
+            terminal.val(content + msg + "\n");
         
             if(terminal.length)
                 terminal.scrollTop(terminal[0].scrollHeight - terminal.height());
         });
 
 
-        socket.on("refresh-clients", (clients, platform) => {
+        socket.on("refresh-clients", (clients) => {
             // Updates the client dropdown selection
             console.log(clients);
 
             $("#client-selection").empty();
+            $("#status").text(clients.length);
 
             for (let i = 0; i < clients.length; i++)
             {
                 let client = clients[i]["name"];
+                let os = clients[i]["os"];
+                
+                if (client == "Web-Terminal" && os == "web")    // skipping unnecessary Web-Terminal
+                    continue;
+                 
                 console.log(client);
-
-                $("#status").text(clients.length);
-                let button = "<button class='dropdown-item' onclick='updateCurrentClient(\"" + `${client}\", \"${platform}\")'>` + client + "</button>";
+                let button = "<button class='dropdown-item' onclick='updateCurrentClient(\"" + `${client}\", \"${os}\")'>` + client + "</button>";
 
                 $("#client-selection").append(button);
             }

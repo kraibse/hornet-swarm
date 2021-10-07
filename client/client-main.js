@@ -33,7 +33,7 @@ const socket = io(url + ip + ":" + port, {
 
 socket.on("connect", () => {
     setCurrentDirVariable();
-    socket.emit("register", os.hostname());
+    socket.emit("register", os.hostname(), os.platform());
 });
 
 socket.on("new-message", (msg) => {
@@ -60,7 +60,7 @@ socket.on("send-command", (data) => {
 
     // Start of custom commands
     console.log(os.platform());
-    if (command == "clear" && os.platform() == "Windows")
+    if (command == "clear" || command == "cls")
     {
         socket.emit('clear-terminal');    // triggered on webterminal
         socket.to(sid).emit('new-message', cwd + "$ " + command);
@@ -76,6 +76,7 @@ socket.on("send-command", (data) => {
         }
         socket.emit("new-message", (message));
         socket.emit("new-message", (stdout));
+        socket.emit("new-message", (stderr))
         console.log(stdout);
     });
 });

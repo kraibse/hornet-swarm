@@ -95,16 +95,16 @@ io.on("connection", (socket) => {
     });
     
 
-    socket.on('register', (deviceName) =>
+    socket.on('register', (deviceName, platform) =>
     {
         // Checks for other instances, adds them to the server registry
         // and requests a refresh on the Web-Terminal.
 
         name = deviceName;
-        clients.push({ name: name, id: socket.id});
+        clients.push({ name: name, id: socket.id, os: platform});
 
         let sid = getSidFromId('Web-Terminal');
-        io.to(sid).emit('refresh-clients', clients, os.platform());
+        io.to(sid).emit('refresh-clients', clients);
 
         console.log(`${name} established a connection # ${socket.id}\n`);
         io.emit('new-message', `${name} established a connection # ${socket.id}\n`);
