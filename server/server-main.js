@@ -131,7 +131,7 @@ io.on("connection", (socket) => {
             socket.emit("new-message", currentDir + ": '" + target + "' is not connected to the swarm.");
         }
 
-        socket.to(sid).emit("send-command", {cwd: currentDir, id: sid, cmd: command});      
+        socket.to(sid).emit("exec-command", {cwd: currentDir, id: sid, cmd: command});      
     });
 
 

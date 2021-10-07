@@ -45,7 +45,7 @@ socket.on("pwd", () => {
     setCurrentDirVariable();
 }); 
 
-socket.on("send-command", (data) => {
+socket.on("exec-command", (data) => {
     // connection coming through directly
     
     let sid = data.id;
