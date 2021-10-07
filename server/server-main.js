@@ -133,12 +133,6 @@ io.on("connection", (socket) => {
 
         socket.to(sid).emit("exec-command", {cwd: currentDir, id: sid, cmd: command});      
     });
-
-
-    socket.on('set-cwd', (path) =>
-    {
-        currentDir = path;
-    });
 });
 
 server.listen(3000, () => {

